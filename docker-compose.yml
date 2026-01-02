@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  wan2.2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wan2.2:latest
+    container_name: wan2.2-app
+    runtime: nvidia  # Requires NVIDIA Docker runtime
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      # Mount models directory (download models here)
+      - ./models:/app/models
+      # Mount outputs directory
+      - ./outputs:/app/outputs
+      # Mount examples directory
+      - ./examples:/app/examples
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Override command for different tasks
+    # Uncomment and modify as needed:
+    # command: ["--task", "ti2v-5B", "--size", "1280*704", "--ckpt_dir", "./models/Wan2.2-TI2V-5B", "--prompt", "Two cats fighting"]
+    
+    # For interactive mode:
+    stdin_open: true
+    tty: true
